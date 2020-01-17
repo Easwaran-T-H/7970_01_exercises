@@ -1,0 +1,284 @@
+# Easwaran.T.H
+
+import pandas as pd
+import numpy as np
+
+sd=pd.read_excel('SaleData.xlsx')
+
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+#   1. Find the least amount sale that was done for each item
+def q1(sd):
+    leastamt = sd.groupby(["Item"])["Sale_amt"].min().reset_index()
+    print(leastamt)
+q1(sd)
+
+
+#   2.Compute the total sales for each year and region across all items
+def q2(sd):    
+    print(sd.OrderDate.dtype)
+    sd['Year']=sd['OrderDate'].dt.year
+    ts=sd.groupby(['Year','Region'])
+    ts1=ts.agg({'Sale_amt' : 'sum'})
+    print(ts.groups)
+    print(ts_1) 
+q2(sd)
+
+
+#   3.Create new column 'days_diff' with number of days difference between reference date passed and each order date
+def q3(sd):    
+    sd['days_diff']=pd.to_datetime("now")-sd['OrderDate']
+    print(sd)
+q3(sd)
+
+
+#   4.Create a dataframe with two columns: 'manager', 'list_of_salesmen'. Column 'manager' will contain the
+#     unique managers present and column 'list_of_salesmen' will contain an array of all salesmen under each manager
+def q4(sd):
+    df=sd.groupby(['Manager'])
+    df1=df.agg({'SalesMan' : 'unique'})
+    print(sd.groups)
+    print(df1)
+q4(sd)
+
+
+#   5.For all regions find number of salesman and total sales. Return as a dataframe with three columns -
+#     Region, salesmen_count and total_sales
+def q5(sd):
+    n=sd.groupby(['Region'])
+    print(ls5.groups)
+    n1=n.agg({'SalesMan':'nunique','Units':'sum'})
+    n1.columns=['salesman_count','total_sales']
+    print(n1)
+q5(sd)
+
+
+#   6.Create a dataframe with total sales as percentage for each manager. Dataframe to contain manager and percent_sales
+def q6(sd):
+    p=sd.groupby(['Manager'])
+    print(p.groups)
+    p1=p.agg({'Sale_amt':'sum'})
+    p1.columns=['total sales in percentage']
+    sum=0
+    for i in range(0,len(p1)):
+        sum=int(sum+p1['total sales in percentage'][i])
+        print(sum)
+    p1['total sales in percentage']=p1['total sales in percentage']/sum*100
+    print(p1)
+q6(sd)
+
+#------------------------------------------------------------------------------------------------------------------------------------------
+
+
+#imdb dataset load
+
+import numpy as np
+import pandas as pd
+import csv
+
+sd=pd.read_csv('imdb.csv')
+
+l=[] #empty list
+with open('imdb.csv',encoding='utf-8') as csvfile:
+    readCSV = csv.reader(csvfile, delimiter=',')
+    for row in readCSV:
+        if(len(row)==44):
+            l.append(row)
+
+sd=pd.DataFrame(l[1:], columns = l[0])
+sd['imdbRating']=pd.to_numeric(sd['imdbRating'], errors='coerce')
+
+cols=['ratingCount','duration','year','nrOfWins','nrOfNominations','nrOfPhotos','nrOfNewsArticles','nrOfGenre',	'Action','Adult','Adventure','Animation','Biography'	,'Comedy'	,'Crime'	,'Documentary'	,'Drama','Family','Fantasy'	,'FilmNoir','GameShow','History'	,'Horror',	'Music','Musical','Mystery','News'	,'RealityTV',	'Romance','SciFi','Short','Sport','TalkShow'	,'Thriller'	,'War','Western']
+sd[cols] = sd[cols].apply(pd.to_numeric, errors='coerce').astype('Int32')
+
+#------------------------------------------------------------------------------------------------------------------------------------------
+
+#   7. Get the imdb rating for fifth movie of dataframe
+def q7(sd):
+    print(sd['imdbRating'][4])
+q7(sd)
+
+
+#   8.Return titles of movies with shortest and longest run time
+def q8(sd):
+    sd.sort_values("duration",inplace=True)
+    ls=sd.groupby(['duration'])
+    print(ls.groups)
+    ls_final=ls.agg({'title' : 'unique'})
+    print(ls_final[1])
+    d={'shortest':ls_final['title'].iloc[1],'longest':ls_final['title'].iloc[len(ls_final)-1]}
+    sd_final=pd.DataFrame(d)
+q8(sd)
+
+
+#   9.Sort the data frame by in the order of when they where released and have higer ratings, Hint :
+#     release_date (earliest) and Imdb rating(highest to lowest)
+def q9(sd):
+    sd.sort_values(['year', 'imdbRating'], ascending=[True, False],inplace=True)
+q9(sd)
+
+
+#  10.Subset the dataframe with movies having the following prameters.  
+#         -revenue more than 2 million(not given in the dataset)
+#         -spent less than 1 million(not given)
+#         -duration between 30 mintues to 180 minute () 
+def q10(sd):
+    ls10_final=sd[(sd['duration']>=30) & (sd['duration']<=180)]
+q10(sd)
+
+
+#------------------------------------------------------------------------------------------------------------------------------------------
+
+# load diamonds.csv
+
+
+import numpy as np
+import pandas as pd
+
+sd=pd.read_csv('diamonds.csv')
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+
+#     11.Count the duplicate rows of diamonds DataFrame
+#        this will give us number of times each rows repeats
+def q11(sd):
+    dup=sd.groupby(sd.columns.tolist(),as_index=False).size()
+    dup1=pd.DataFrame(ls11)
+    dup1.columns=['count']
+    dup2=dup1[dup1['count']>1]#this will give ony duplicate rows
+q11(sd)
+
+
+#     12.Drop rows in case of missing values in carat and cut columns
+def q12(sd):
+    miss = sd[pd.notnull(sd['carat']) & pd.notnull(sd['cut'])]
+q12(sd)
+
+
+#     13.Subset the dataframe with only numeric columns
+def q13(sd):
+    cols=['carat','z']
+    sd[cols] = sd[cols].apply(pd.to_numeric, errors='coerce')
+    ncf=sd._get_numeric_data()
+q13(sd)
+
+
+#     14.Compute volume as (xyz) when depth is greater than 60. In case of depth less than 60 default volume to 8
+def q14(sd):
+    sd['z']=pd.to_numeric(sd['z'],errors='coerce')   #to convert every value into an floating point object
+    sd.replace(to_replace='None', value=1, inplace=True)
+    sd.fillna(1, inplace=True)
+    for i in sd['depth']:
+        if(i>60):
+            sd['volume']=sd['x']*sd['y']*sd['z']
+        else:
+            sd['volume']=8.0
+q14(sd)        
+
+    
+#Q15.imputing the missing values with mean
+def q15(sd):
+    sd['price']=sd['price'].fillna(sd['price'].mean())
+q15(sd)
+
+
+#----------------------------------------------------------------------------------------------------------------------------------------
+
+####   BONUS QUESTIONS   ###
+
+from tigerml.eda import Analyser
+import seaborn as sns
+import matplotlib.pyplot as plt
+import re
+%matplotlib inline
+
+imd=pd.read_csv("imdb.csv",escapechar='\\')
+met=pd.read_csv("movie_metadata.csv").dropna()
+dia=pd.read_csv("diamonds.csv")
+
+met['profit']=met['gross']-met['budget']
+met.head()
+
+
+
+#    1. Generate a report that tracks the various Genere combinations for each type year on year. The result data frame 
+#       should contain type, Genere_combo, year, avg_rating, min_rating, max_rating, total_run_time_mins
+def bq1(imd):         
+    imd['GenreCombo']=imd[imd.columns[16:]].T.apply(lambda g: '|'.join(g.index[g==1]),axis=0)
+    print(imd.groupby(["type","year","GenreCombo"]).agg({"imdbRating":[min,max,np.mean],'duration':np.sum}))
+bq1(imd)
+         
+         
+#   2. Is there a relation between the length of a movie title and the ratings ? Generate a report that captures the trend 
+#      of the number    of letters in movies titles over years. We expect a cross tab between the year of the video release 
+#      and the quantile that length fall under. The results should contain year, min_length, max_length, 
+#      num_videos_less_than25Percentile, num_videos_25_50Percentile , num_videos_50_75Percentile, num_videos_greaterthan75Precentile      
+def bq2(imd):         
+    imd.dropna()
+    imd['length']=imd.apply(lambda imd:len(imd['title'].split('(')[0].rstrip()),axis=1)
+    quant=pd.DataFrame(imd["length"].quantile([0.25,0.5,0.75]).reset_index())
+    imd["percentile"]=imd['length'].apply(lambda imd:1 if imd<quant.iloc[0,1]  else(2 if imd<quant.iloc[1,1] else(3 if imd<quant.iloc[2,1] else 4)))
+    table=imd.pivot_table(index="year",columns=['percentile'],values=["length"],aggfunc={"length":'count'},fill_value=0)
+    table[["min","max"]]=imd.groupby("year").agg({"length":[min,max]})
+    print(table)
+bq2(imd)
+
+
+#   3. In diamonds data set Using the volumne calculated above, create bins that have equal population within them. 
+#      Generate a report that contains cross tab between bins and cut. Represent the number under each cell as a percentage of total.
+def bq3(dia):         
+    dia['z']=dia['z'].apply(pd.to_numeric,errors='coerce')
+    dia['volume']=dia.apply(lambda f: f['x'] * f['y'] * f['z'] if f['depth']>60 else 8,axis=1)
+    dia["bin"]=pd.qcut(dia["volume"],q=5,labels=['1','2','3','4','5'])
+    pd.crosstab(dia["bin"],dia["cut"],normalize='columns')
+bq3(dia)
+
+
+#   4. Generate a report that tracks the Avg. imdb rating quarter on quarter, in the last 10 years, for movies that are top performing. 
+#      You can take the top 10% grossing movies every quarter. Add the number of top performing movies under each genere in the report 
+#      as well.
+def bq4(met):         
+    x1=met.groupby("title_year")["imdb_score"].mean().reset_index()
+    x2=pd.DataFrame(met.groupby("title_year")["gross"].apply(lambda x: x.nlargest(3).index).reset_index())
+    x2=b["gross"].apply(lambda x:met.loc[x,"movie_title"]).fillna("")
+    x2["title"]=""
+    for j in range(0,74):
+        for i in range(0,180):
+            if(len(x2.iloc[j,i])>1):
+                x2.iloc[j,180]=x2.iloc[j,180]+x2.iloc[j,i]+","
+            else:
+                 x2.iloc[j,180]=x2.iloc[j,180]+x2.iloc[j,i]
+            
+    x2["title"]=x2["title"].map(lambda x: str(x)[:-1])
+    x1.join(x2).iloc[:,np.r_[0,1,182]]        
+bq4(met)
+
+
+#   5. Bucket the movies into deciles using the duration. Generate the report that tracks various features like nomiations, wins, 
+#      count, top 3 genres in each decile.
+def bq5(imd):         
+    imd['decile']=pd.qcut(imd["duration"],q=10,labels=False)
+    x=imd.groupby("decile")[["nrOfNominations","nrOfWins"]].sum()
+    x["count"]=imd.groupby("decile")["year"].count()
+    y=imd.iloc[:,np.r_[8,17:45]]
+    z=y.groupby("decile")[y.columns.tolist()[1:28]].sum()
+    z=z.transpose()
+    c=pd.DataFrame(z.apply(lambda x: x.nlargest(3).index,axis=0).transpose())
+    c.columns=["first","second","third"]
+    x["top genres"]=c["1st"] + "," + c["2nd"] + "," + c["3rd"]
+    print(x)
+bq5(imd)
+
+
+#   6. Using the movie metadata set and the imdb data set come up with finidings (slice and dice the data to identify insights) 
+#      and also create charts whereever possible.
+def bq6(imd):
+    col_n=['imdbRating','ratingCount','duration','year','nrOfWins','nrOfNominations','nrOfGenre']
+    imd2=pd.DataFrame()
+    for col in col_n:
+        imd2[col] = imd[col]
+    an = Analyser(imd2, y='year')  #imdb report based on year
+    an.get_report(quick=False)
+bq6(imd)
+
+
